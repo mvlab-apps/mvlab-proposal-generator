@@ -611,14 +611,6 @@ function setDisc(rid, val) {
   upd();
 }
 
-function setValor(rid, val) {
-  const item = items.find(i => i.rid === rid);
-  if (!item) return;
-  const v = parseFloat(val);
-  if (!isNaN(v) && v >= 0) item.valor = v;
-  upd();
-}
-
 // ── RENDER ──
 function render() {
   const has = items.length > 0;
@@ -650,15 +642,7 @@ function render() {
         <span style="font-size:11px;color:var(--muted)">%</span>
       </div>
       <div class="r-up">
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-          <input type="number" value="${it.valor}" min="0" step="0.01"
-            style="width:90px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:4px 7px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;text-align:right;outline:none;transition:border .15s;"
-            onfocus="this.style.borderColor='var(--golden)'"
-            onblur="this.style.borderColor='rgba(255,255,255,.12)';setValor(${it.rid},this.value)"
-            onkeydown="if(event.key==='Enter'){this.blur()}"
-            >
-          ${disc > 0 ? `<span style="font-size:10px;color:var(--violet);font-weight:700">-${disc}% = R$\u00a0${fmt(valorDesc)}</span>` : ''}
-        </div>
+        ${disc > 0 ? `<span style="font-size:10px;color:var(--muted);text-decoration:line-through;display:block">R$\u00a0${fmt(it.valor)}</span><span style="color:var(--violet);font-size:12px;font-weight:700">R$\u00a0${fmt(valorDesc)}</span>` : `R$\u00a0${fmt(it.valor)}`}
       </div>
       <div class="r-sub">R$\u00a0${fmt(rowSub)}</div>
       <button class="r-del" onclick="remItem(${it.rid})">✕</button>
@@ -872,40 +856,25 @@ function doPrint() {
   }
 
   // ── SALVAR NO GOOGLE DRIVE ──
-  const proposalData = {
-    cliente: cl,
-    projeto: pr,
-    num: cfg.num,
-    items: items.map(it => ({
-      nome: it.nome,
-      unidade: it.unidade,
-      valor: it.valor,
-      qty: it.qty,
-      disc: it.disc || 0,
-      cat: it.cat
-    })),
-    subtotal: subLiq,
-    desconto: da,
-    adicionais: adicTotal,
-    total: fin,
-    notes: notes,
-    validade: valid,
-    pagamento: cfg.pay
-  };
-
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
-    body: JSON.stringify(proposalData),
-    headers: { 'Content-Type': 'text/plain' }
+    body: JSON.stringify({
+      cliente: cl,
+      projeto: pr,
+      num: cfg.num,
+      items: items.map(it => ({ nome: it.nome, unidade: it.unidade, valor: it.valor, qty: it.qty, disc: it.disc || 0, cat: it.cat })),
+      subtotal: subLiq,
+      desconto: da,
+      adicionais: adicTotal,
+      total: fin,
+      notes: notes,
+      validade: valid,
+      pagamento: cfg.pay
+    }),
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
   }).then(r => r.json())
-    .then(result => {
-      if (result.success) {
-        toast('✓ Proposta salva no Drive!');
-      } else {
-        console.error('Drive error:', result.error);
-      }
-    })
-    .catch(err => console.error('Erro Drive:', err));
+    .then(res => { if (res.success) toast('✓ Proposta salva no Drive!'); })
+    .catch(() => {});
 
   document.getElementById('builder').style.display = 'none';
   document.getElementById('print-view').style.display = 'block';
@@ -919,4 +888,4 @@ function doPrint() {
 init();
 </script>
 </body>
-</html
+</html>
