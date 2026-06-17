@@ -871,19 +871,6 @@ function doPrint() {
     scopeSection.style.display = 'none';
   }
 
-  document.getElementById('builder').style.display = 'none';
-  document.getElementById('print-view').style.display = 'block';
-  setTimeout(() => {
-    window.print();
-    document.getElementById('builder').style.display = 'block';
-    document.getElementById('print-view').style.display = 'none';
-  }, 300);
-}
-
-init();
-</script>
-</body>
-</html
   // ── SALVAR NO GOOGLE DRIVE ──
   const proposalData = {
     cliente: cl,
@@ -908,7 +895,8 @@ init();
 
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
-    payload: JSON.stringify(proposalData)
+    body: JSON.stringify(proposalData),
+    headers: { 'Content-Type': 'text/plain' }
   }).then(r => r.json())
     .then(result => {
       if (result.success) {
@@ -917,6 +905,18 @@ init();
         console.error('Drive error:', result.error);
       }
     })
-    .catch(err => console.error('Erro:', err));
+    .catch(err => console.error('Erro Drive:', err));
 
-  >
+  document.getElementById('builder').style.display = 'none';
+  document.getElementById('print-view').style.display = 'block';
+  setTimeout(() => {
+    window.print();
+    document.getElementById('builder').style.display = 'block';
+    document.getElementById('print-view').style.display = 'none';
+  }, 300);
+}
+
+init();
+</script>
+</body>
+</html
