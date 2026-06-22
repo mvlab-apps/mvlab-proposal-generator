@@ -610,6 +610,13 @@ function setDisc(rid, val) {
   upd();
 }
 
+function setValor(rid, val) {
+  const item = items.find(i => i.rid === rid);
+  if (!item) return;
+  const v = parseFloat(val);
+  if (!isNaN(v) && v >= 0) { item.valor = v; render(); }
+}
+
 // ── RENDER ──
 function render() {
   const has = items.length > 0;
@@ -641,7 +648,12 @@ function render() {
         <span style="font-size:11px;color:var(--muted)">%</span>
       </div>
       <div class="r-up">
-        ${disc > 0 ? `<span style="font-size:10px;color:var(--muted);text-decoration:line-through;display:block">R$\u00a0${fmt(it.valor)}</span><span style="color:var(--violet);font-size:12px;font-weight:700">R$\u00a0${fmt(valorDesc)}</span>` : `R$\u00a0${fmt(it.valor)}`}
+        <input type="number" value="${it.valor}" min="0" step="0.01"
+          style="width:94px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:5px 7px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;text-align:right;outline:none;transition:border .15s;"
+          onfocus="this.style.borderColor='var(--golden)'"
+          onblur="this.style.borderColor='rgba(255,255,255,.12)';setValor(${it.rid},this.value)"
+          onkeydown="if(event.key==='Enter')this.blur()">
+        ${disc > 0 ? `<span style="font-size:10px;color:var(--violet);font-weight:700;display:block;text-align:right;margin-top:2px">-${disc}% = R$\u00a0${fmt(valorDesc)}</span>` : ''}
       </div>
       <div class="r-sub">R$\u00a0${fmt(rowSub)}</div>
       <button class="r-del" onclick="remItem(${it.rid})">✕</button>
