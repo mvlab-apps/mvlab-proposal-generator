@@ -1,4 +1,4 @@
-# MV LAB · Gerador de Propostas (v25)
+# MV LAB · Gerador de Propostas (v26)
 
 Gerador de propostas comerciais da MV LAB. Monta itens a partir do catálogo e gera o PDF com a identidade da marca.
 
@@ -18,7 +18,8 @@ Não depende de CDN: React, lucide e o runtime ficam em `vendor/`. O GitHub Page
 
 ```
 index.html                 ← UI (template) + lógica (bloco <script type="text/x-dc">)
-data/services.js           ← catálogo de serviços e valores (edite aqui)
+js/github-store.js         ← leitura/gravação no repositório de dados (GitHub Contents API)
+data/services.js           ← tabela de cachês embutida (usada offline ou antes da 1ª publicação)
 assets/fonts/              ← After + Muring 01 (100–900)
 assets/img/                ← logo, logo alternativo, símbolo
 vendor/dc-runtime.js       ← runtime do Claude Design (não editar, é gerado)
@@ -31,6 +32,51 @@ vendor/react-*.js, vendor/lucide-*.js
 - **Template:** HTML com `{{ expressões }}`, `<sc-if value="{{ x }}">` e `<sc-for list="{{ xs }}" as="x">`. Eventos usam `sc-camel-on-click`, `sc-camel-on-input` etc.
 - **Lógica:** a `class Component extends DCLogic`, no fim do arquivo. O `state` guarda os dados, e `renderVals()` devolve tudo o que o template usa.
 - **Valores do catálogo:** para mudar preços, edite só `data/services.js`.
+
+## Dados online (cachês e propostas)
+
+O app (este repositório, público, servido pelo GitHub Pages) não guarda dados. Cachês e propostas ficam no repositório **privado** `mvlab-apps/mvlab-proposal-data`:
+
+```
+cache/servicos.json     ← tabela de cachês (botão "Editar cachês" no app)
+propostas/index.json    ← lista da aba "Equipe (online)" em Recentes
+propostas/<id>.json     ← proposta completa
+pacotes/biblioteca.json ← biblioteca de pacotes da equipe (criado no 1º salvamento)
+```
+
+- **Cada salvamento é um commit** com autor e descrição. O histórico de versões fica no GitHub.
+- **Salvar** grava a proposta online. **Gerar PDF** também salva. Reabrir e salvar de novo atualiza o mesmo arquivo, sem criar duplicata.
+- **Sem token, o app funciona offline:** usa a tabela embutida em `data/services.js` e salva só no navegador. O botão “Offline”, na barra superior, abre a conexão.
+- **Duas pessoas salvando a mesma proposta:** vale a última gravação. A versão anterior continua no histórico do GitHub.
+- **Duas pessoas editando a tabela de cachês:** o app recusa a segunda gravação e pede para recarregar, então ninguém sobrescreve a outra sem perceber.
+
+### Conectar um usuário (uma vez por navegador)
+
+1. No GitHub: **Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
+2. **Resource owner:** `mvlab-apps`. **Repository access:** *Only select repositories* → `mvlab-proposal-data`.
+3. **Permissions → Repository → Contents: Read and write**. Defina uma validade (ex.: 1 ano).
+4. No app: botão **Offline** → cole o token, informe seu nome → **Salvar e testar**.
+
+O token fica só no `localStorage` daquele navegador e só dá acesso ao repositório de dados. Para revogar, apague o token no GitHub ou use **Desconectar** no app.
+
+> Se a organização exigir aprovação de tokens, um owner da `mvlab-apps` precisa aprovar em **Settings → Personal access tokens → Pending requests**.
+
+## Novidades da v26
+
+### Copiar pacotes e biblioteca de pacotes
+- O botão **Copiar / salvar ▾**, no cabeçalho de cada pacote, copia o pacote para qualquer cenário da proposta ou o duplica no próprio cenário.
+- **Salvar na biblioteca** guarda o pacote como modelo (itens, quantidades, valores, descrições, ×N, preço fechado e adicionais).
+- A biblioteca aparece no catálogo em **★ Pacotes salvos**. Um clique insere o pacote em qualquer proposta. Com o GitHub conectado, a biblioteca é da equipe (`pacotes/biblioteca.json`). Sem conexão, fica salva neste navegador.
+- Os valores inseridos são os que estavam no pacote quando ele foi salvo. Se a tabela de cachês mudar, ajuste os valores depois de inserir.
+
+### Edição completa dos itens
+- Categoria, nome e unidade de qualquer item são editáveis direto na linha. Basta clicar no texto.
+- **+ descrição** abre um texto livre que aparece no PDF, logo abaixo do nome do item (também dentro de pacotes).
+
+### Reordenar
+- Use as setas ↑ ↓ de cada item, ou arraste pela alça ⠿.
+- Soltar o item sobre outro coloca o arrastado antes dele. Soltar no cabeçalho de um pacote move o item para dentro do pacote. Soltar em “Itens avulsos” tira o item do pacote.
+- Pacotes têm setas ↑ ↓ próprias. No PDF, os itens avulsos vêm primeiro e os pacotes depois, na ordem definida.
 
 ## Novidades da v25
 

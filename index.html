@@ -640,6 +640,7 @@ a:hover { text-decoration: underline; }
 </style>
   <script src="vendor/mvlab-design-system.js"></script>
   <script src="data/services.js"></script>
+  <script src="js/github-store.js"></script>
   <script src="vendor/lucide-1.24.0.min.js"></script>
   <style>
     html, body { margin: 0; padding: 0; background: var(--mv-diffusion, #F6F6F4); }
@@ -653,7 +654,7 @@ a:hover { text-decoration: underline; }
     @media print {
       html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       html, body { margin: 0; padding: 0; background: var(--mv-diffusion) !important; }
-      #app-root { display: none !important; }
+      #app-root, .no-print { display: none !important; }
       #print-root { display: block !important; }
       #dc-root, .sc-host { height: auto !important; }
       .doc { width: auto; margin: 0; }
@@ -667,7 +668,13 @@ a:hover { text-decoration: underline; }
   <aside data-screen-label="Catálogo" style="width: 356px; min-width: 330px; flex-shrink: 0; background: var(--mv-blackout); color: var(--mv-diffusion); display: flex; flex-direction: column; overflow-y: auto;">
     <div style="flex-shrink: 0; padding: 22px 20px 16px; display: flex; flex-direction: column; gap: 14px;">
       <img src="assets/img/mvlab-logo.png" alt="MV LAB" style="height: 40px; width: auto; align-self: flex-start;">
-      <div style="font-family: var(--font-label); font-weight: 600; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--mv-keylight);">// Catálogo de serviços</div>
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <div style="font-family: var(--font-label); font-weight: 600; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--mv-keylight);">// Catálogo de serviços</div>
+          <div style="font-family: var(--font-body); font-weight: 300; font-size: 10px; color: var(--mv-ink-400);">Tabela {{ svcTag }}</div>
+        </div>
+        <button sc-camel-on-click="{{ openCatalog }}" style="padding: 5px 10px; border-radius: 8px; cursor: pointer; background: transparent; border: 1px solid var(--mv-ink-600); color: var(--mv-diffusion); font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .06em; text-transform: uppercase;" style-hover="border-color: var(--mv-keylight); color: var(--mv-keylight);">Editar cachês</button>
+      </div>
     </div>
 
     <div style="flex-shrink: 0; padding: 0 16px 12px;">
@@ -684,6 +691,7 @@ a:hover { text-decoration: underline; }
     </div>
 
     <div id="mv-sidebar-scroll" style="flex: 1; min-height: 180px; overflow-y: auto; padding: 4px 10px 10px; border-top: 1px solid var(--mv-ink-800);">
+<sc-if value="{{ showServices }}" hint-placeholder-val="{{ true }}">
       <sc-for list="{{ services }}" as="s" hint-placeholder-count="8">
         <div sc-camel-on-click="{{ s.add }}" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 10px 10px; border-radius: 12px; cursor: pointer; border: 1px solid transparent; transition: all 140ms cubic-bezier(.22,1,.36,1);" style-hover="background: rgba(246,246,244,.05); border-color: var(--mv-ink-700);">
           <div style="min-width: 0;">
@@ -699,6 +707,28 @@ a:hover { text-decoration: underline; }
           </div>
         </div>
       </sc-for>
+      </sc-if>
+      <sc-if value="{{ showLib }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ libCards }}" as="lb" hint-placeholder-count="2">
+          <div sc-camel-on-click="{{ lb.add }}" style="display: flex; flex-direction: column; gap: 4px; padding: 10px 10px; margin-bottom: 4px; border-radius: 12px; cursor: pointer; border: 1px solid var(--mv-ink-700); transition: all 140ms cubic-bezier(.22,1,.36,1);" style-hover="background: rgba(246,246,244,.05); border-color: var(--mv-keylight);">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;">
+              <div style="min-width: 0;">
+                <div style="font-family: var(--font-label); font-weight: 600; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: {{ lb.tagColor }}; margin-bottom: 2px;">★ Pacote · {{ lb.tag }}</div>
+                <div style="font-family: var(--font-display); font-weight: 700; font-size: 13px; line-height: 1.25; color: var(--mv-diffusion);">{{ lb.nome }}</div>
+                <div style="font-family: var(--font-body); font-weight: 300; font-size: 11px; color: var(--mv-ink-400); margin-top: 1px;">{{ lb.meta }}</div>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+                <div style="font-family: var(--font-display); font-weight: 800; font-size: 13px; color: var(--mv-keylight); white-space: nowrap;">{{ lb.preco }}</div>
+                <button sc-camel-on-click="{{ lb.del }}" title="Excluir da biblioteca" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--mv-ink-600); border-radius: 6px; color: var(--mv-ink-400); cursor: pointer;" style-hover="border-color: var(--status-rec); color: var(--status-rec);"><svg width="10" height="10" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+              </div>
+            </div>
+            <div style="font-family: var(--font-body); font-weight: 300; font-size: 10.5px; line-height: 1.4; color: var(--mv-ink-400);">{{ lb.itemsLine }}</div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ libEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 20px 12px; text-align: center; color: var(--mv-ink-400); font-size: 12px; font-weight: 300; line-height: 1.5;">{{ libEmptyMsg }}</div>
+        </sc-if>
+      </sc-if>
       <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
         <div style="padding: 24px; text-align: center; color: var(--mv-ink-400); font-size: 13px; font-weight: 300;">Nenhum resultado</div>
       </sc-if>
@@ -719,19 +749,23 @@ a:hover { text-decoration: underline; }
   <main data-screen-label="Proposta" style="flex: 1; min-width: 560px; display: flex; flex-direction: column; overflow: hidden;">
 
     <div style="padding: 14px 28px; background: var(--mv-white); border-bottom: 1px solid var(--line-soft); display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap;">
-      <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 120px; min-width: 110px; max-width: 200px;">
         <label style="font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);">Cliente</label>
-        <input type="text" value="{{ client }}" sc-camel-on-input="{{ setClient }}" placeholder="Nome do cliente" style="width: 180px; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 8px 12px; color: var(--mv-blackout); font-family: var(--font-body); font-size: 13px; outline: none; transition: border-color 160ms cubic-bezier(.22,1,.36,1);" style-focus="border-color: var(--mv-blackout);">
+        <input type="text" value="{{ client }}" sc-camel-on-input="{{ setClient }}" placeholder="Nome do cliente" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 8px 12px; color: var(--mv-blackout); font-family: var(--font-body); font-size: 13px; outline: none; transition: border-color 160ms cubic-bezier(.22,1,.36,1);" style-focus="border-color: var(--mv-blackout);">
       </div>
-      <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 120px; min-width: 110px; max-width: 200px;">
         <label style="font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);">Projeto / Referência</label>
-        <input type="text" value="{{ project }}" sc-camel-on-input="{{ setProject }}" placeholder="Ex: Marketing Q2" style="width: 190px; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 8px 12px; color: var(--mv-blackout); font-family: var(--font-body); font-size: 13px; outline: none; transition: border-color 160ms cubic-bezier(.22,1,.36,1);" style-focus="border-color: var(--mv-blackout);">
+        <input type="text" value="{{ project }}" sc-camel-on-input="{{ setProject }}" placeholder="Ex: Marketing Q2" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 8px 12px; color: var(--mv-blackout); font-family: var(--font-body); font-size: 13px; outline: none; transition: border-color 160ms cubic-bezier(.22,1,.36,1);" style-focus="border-color: var(--mv-blackout);">
       </div>
-      <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 120px; min-width: 110px; max-width: 200px;">
         <label style="font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);">Validade</label>
-        <input type="date" value="{{ validade }}" sc-camel-on-input="{{ setValidade }}" style="width: 150px; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 7px 12px; color: var(--mv-blackout); font-family: var(--font-body); font-size: 13px; outline: none;" style-focus="border-color: var(--mv-blackout);">
+        <input type="date" value="{{ validade }}" sc-camel-on-input="{{ setValidade }}" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 7px 12px; color: var(--mv-blackout); font-family: var(--font-body); font-size: 13px; outline: none;" style-focus="border-color: var(--mv-blackout);">
       </div>
       <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+        <button sc-camel-on-click="{{ openGh }}" title="Conexão com o GitHub" style="display: flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 9px; cursor: pointer; background: var(--surface-sunk); border: 1px solid var(--line-soft); font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: {{ netFg }}; white-space: nowrap;" style-hover="border-color: var(--mv-blackout);">
+          <span style="width: 7px; height: 7px; border-radius: 50%; background: {{ netDot }}; display: inline-block;"></span>{{ netLabel }}
+        </button>
+        <x-import component-from-global-scope="MVLABDesignSystem_5446a1.Button" variant="ghost" size="sm" on-click="{{ saveNow }}" hint-size="auto,36px">Salvar</x-import>
         <div style="position: relative;">
           <x-import component-from-global-scope="MVLABDesignSystem_5446a1.Button" variant="ghost" size="sm" on-click="{{ openRecent }}" hint-size="auto,36px">Recentes</x-import>
           <sc-if value="{{ hasRecents }}" hint-placeholder-val="{{ false }}">
@@ -832,15 +866,19 @@ a:hover { text-decoration: underline; }
           <div style="background: var(--mv-white); border: 1px solid var(--line-soft); border-radius: 18px; overflow: hidden; margin-bottom: 14px;">
 
             <sc-if value="{{ sec.isLoose }}" hint-placeholder-val="{{ true }}">
-              <div style="padding: 10px 18px; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line-soft);">
+              <div sc-camel-on-drag-over="{{ sec.onDragOver }}" sc-camel-on-drop="{{ sec.onDrop }}" style="padding: 10px 18px; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line-soft); background: {{ sec.headDrop }};">
                 <span style="font-family: var(--font-label); font-weight: 600; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--mv-tungsten);">// {{ sec.title }}</span>
                 <span style="font-family: var(--font-body); font-weight: 300; font-size: 11px; color: var(--text-muted);">{{ sec.hint }}</span>
               </div>
             </sc-if>
 
             <sc-if value="{{ sec.isPkg }}" hint-placeholder-val="{{ false }}">
-              <div style="padding: 12px 18px; background: var(--mv-keylight-100); border-bottom: 2px solid var(--mv-keylight); display: flex; flex-direction: column; gap: 10px;">
+              <div sc-camel-on-drag-over="{{ sec.onDragOver }}" sc-camel-on-drop="{{ sec.onDrop }}" style="padding: 12px 18px; background: var(--mv-keylight-100); border-bottom: 2px solid var(--mv-keylight); box-shadow: inset 0 0 0 3px {{ sec.headDrop }}; display: flex; flex-direction: column; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                  <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <button sc-camel-on-click="{{ sec.moveUp }}" title="Mover pacote para cima" style="width: 22px; height: 15px; display: flex; align-items: center; justify-content: center; background: var(--mv-white); border: 1px solid var(--line-soft); border-radius: 4px; cursor: pointer; padding: 0;" style-hover="background: var(--mv-keylight);"><svg width="10" height="10" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button>
+                    <button sc-camel-on-click="{{ sec.moveDown }}" title="Mover pacote para baixo" style="width: 22px; height: 15px; display: flex; align-items: center; justify-content: center; background: var(--mv-white); border: 1px solid var(--line-soft); border-radius: 4px; cursor: pointer; padding: 0;" style-hover="background: var(--mv-keylight);"><svg width="10" height="10" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button>
+                  </div>
                   <span style="font-family: var(--font-label); font-weight: 700; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; background: var(--mv-blackout); color: var(--mv-keylight); padding: 4px 8px; border-radius: 6px;">Pacote</span>
                   <input type="text" value="{{ sec.nome }}" sc-camel-on-input="{{ sec.setNome }}" placeholder="Nome do pacote (ex: Episódio)" style="flex: 1; min-width: 160px; background: var(--mv-white); border: 2px solid var(--line-soft); border-radius: 10px; padding: 6px 10px; color: var(--mv-blackout); font-family: var(--font-display); font-weight: 700; font-size: 14px; outline: none;" style-focus="border-color: var(--mv-blackout);">
                   <div title="Multiplicador do pacote (ex: nº de episódios)" style="display: flex; align-items: center; gap: 5px; background: var(--mv-white); border: 2px solid var(--line-soft); border-radius: 10px; padding: 3px 6px;">
@@ -848,6 +886,21 @@ a:hover { text-decoration: underline; }
                     <span style="font-family: var(--font-display); font-weight: 800; font-size: 14px; color: var(--mv-blackout);">×</span>
                     <input type="number" value="{{ sec.multStr }}" sc-camel-on-input="{{ sec.setMult }}" min="1" step="1" style="width: 44px; background: transparent; border: none; font-family: var(--font-display); font-weight: 800; font-size: 15px; text-align: center; outline: none; font-variant-numeric: tabular-nums;">
                     <button sc-camel-on-click="{{ sec.incMult }}" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: var(--surface-sunk); border: 1px solid var(--line-soft); border-radius: 6px; cursor: pointer;" style-hover="background: var(--mv-keylight);"><svg width="11" height="11" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+                  </div>
+                  <div style="position: relative;">
+                    <button sc-camel-on-click="{{ sec.toggleMenu }}" style="padding: 6px 10px; border-radius: 9px; cursor: pointer; background: var(--mv-blackout); border: 1.5px solid var(--mv-blackout); font-family: var(--font-display); font-weight: 600; font-size: 12px; color: var(--mv-keylight);" style-hover="filter: brightness(1.2);">Copiar / salvar ▾</button>
+                    <sc-if value="{{ sec.menuOpen }}" hint-placeholder-val="{{ false }}">
+                      <div sc-camel-on-click="{{ sec.toggleMenu }}" style="position: fixed; inset: 0; z-index: 19;"></div>
+                      <div style="position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; min-width: 250px; background: var(--mv-white); border: 1px solid var(--line-soft); border-radius: 12px; box-shadow: 0 10px 28px rgba(0,0,0,.18); padding: 6px; display: flex; flex-direction: column;">
+                        <div style="padding: 6px 10px 4px; font-family: var(--font-label); font-weight: 600; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);">Copiar para</div>
+                        <sc-for list="{{ sec.copyTargets }}" as="ct" hint-placeholder-count="2">
+                          <button sc-camel-on-click="{{ ct.go }}" style="text-align: left; padding: 8px 10px; border-radius: 8px; border: none; background: transparent; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12.5px; color: var(--mv-blackout);" style-hover="background: var(--surface-sunk);">{{ ct.label }}</button>
+                        </sc-for>
+                        <div style="height: 1px; background: var(--line-soft); margin: 4px 6px;"></div>
+                        <button sc-camel-on-click="{{ sec.saveToLib }}" style="text-align: left; padding: 8px 10px; border-radius: 8px; border: none; background: transparent; cursor: pointer; font-family: var(--font-display); font-weight: 700; font-size: 12.5px; color: var(--mv-keylight-700);" style-hover="background: var(--surface-sunk);">★ {{ sec.libLabel }}</button>
+                        <div style="padding: 2px 10px 6px; font-family: var(--font-body); font-weight: 300; font-size: 10.5px; line-height: 1.4; color: var(--text-muted);">Fica disponível em "★ Pacotes salvos", no catálogo, para qualquer proposta.</div>
+                      </div>
+                    </sc-if>
                   </div>
                   <button sc-camel-on-click="{{ sec.ungroup }}" title="Desfaz o pacote; os itens voltam para avulsos" style="padding: 6px 10px; border-radius: 9px; cursor: pointer; background: transparent; border: 1.5px solid var(--line-soft); font-family: var(--font-display); font-weight: 600; font-size: 12px; color: var(--mv-blackout);" style-hover="border-color: var(--mv-blackout);">Desagrupar</button>
                   <button sc-camel-on-click="{{ sec.remove }}" title="Remover pacote e itens" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--line-soft); border-radius: 8px; color: var(--text-muted); cursor: pointer;" style-hover="border-color: var(--status-rec); color: var(--status-rec);"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
@@ -882,16 +935,27 @@ a:hover { text-decoration: underline; }
 
             <div style="overflow-x: auto;">
             <div style="min-width: 680px;">
-              <div style="display: grid; grid-template-columns: 20px 1fr 96px 78px 128px 118px 40px; gap: 10px; padding: 9px 18px; background: var(--mv-blackout); font-family: var(--font-label); font-weight: 600; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--mv-keylight);">
-                <div></div><div>Serviço</div><div>Qtd.</div><div>Desc. %</div><div>Valor unit.</div><div style="text-align: right;">Subtotal</div><div></div>
+              <div style="display: grid; grid-template-columns: 22px 18px 1fr 96px 78px 128px 118px 40px; gap: 10px; padding: 9px 18px; background: var(--mv-blackout); font-family: var(--font-label); font-weight: 600; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--mv-keylight);">
+                <div></div><div></div><div>Serviço</div><div>Qtd.</div><div>Desc. %</div><div>Valor unit.</div><div style="text-align: right;">Subtotal</div><div></div>
               </div>
               <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="2">
-                <div style="display: grid; grid-template-columns: 20px 1fr 96px 78px 128px 118px 40px; gap: 10px; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--mv-ink-100); background: {{ r.rowBg }};" style-hover="background: var(--surface-sunk);">
+                <div sc-camel-on-drag-over="{{ r.onDragOver }}" sc-camel-on-drop="{{ r.onDrop }}" style="display: grid; grid-template-columns: 22px 18px 1fr 96px 78px 128px 118px 40px; gap: 10px; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--mv-ink-100); border-top: {{ r.dropLine }}; opacity: {{ r.rowOpacity }}; background: {{ r.rowBg }};" style-hover="background: var(--surface-sunk);">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 1px;">
+                    <button sc-camel-on-click="{{ r.moveUp }}" title="Subir" style="width: 20px; height: 16px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 4px; color: var(--text-muted); cursor: pointer; padding: 0;" style-hover="background: var(--mv-keylight); color: var(--mv-blackout);"><svg width="10" height="10" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"></path></svg></button>
+                    <span draggable="true" sc-camel-on-drag-start="{{ r.onDragStart }}" sc-camel-on-drag-end="{{ r.onDragEnd }}" title="Arraste para reordenar (ou solte dentro de um pacote)" style="cursor: grab; font-size: 14px; line-height: 1; color: var(--mv-ink-400); user-select: none; padding: 1px 3px;">⠿</span>
+                    <button sc-camel-on-click="{{ r.moveDown }}" title="Descer" style="width: 20px; height: 16px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 4px; color: var(--text-muted); cursor: pointer; padding: 0;" style-hover="background: var(--mv-keylight); color: var(--mv-blackout);"><svg width="10" height="10" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button>
+                  </div>
                   <input type="checkbox" checked="{{ r.sel }}" sc-camel-on-change="{{ r.toggleSel }}" title="Selecionar para agrupar em pacote" style="accent-color: var(--mv-keylight-700); width: 15px; height: 15px; cursor: pointer;">
                   <div style="min-width: 0;">
-                    <div style="font-family: var(--font-label); font-weight: 600; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--mv-tungsten); margin-bottom: 2px;">{{ r.cat }}</div>
-                    <div style="font-family: var(--font-display); font-weight: 600; font-size: 13px; line-height: 1.3; color: var(--mv-blackout);">{{ r.nome }}</div>
-                    <div style="font-family: var(--font-body); font-weight: 300; font-size: 11px; color: var(--text-muted);">{{ r.unidade }}</div>
+                    <input type="text" value="{{ r.cat }}" sc-camel-on-input="{{ r.onCat }}" title="Categoria (editável)" style="display: block; width: 100%; box-sizing: border-box; background: transparent; border: 1px solid transparent; border-radius: 5px; padding: 1px 4px; margin: 0 0 1px -5px; font-family: var(--font-label); font-weight: 600; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--mv-tungsten); outline: none;" style-hover="border-color: var(--line-soft);" style-focus="border-color: var(--mv-tungsten); background: var(--mv-white);">
+                    <input type="text" value="{{ r.nome }}" sc-camel-on-input="{{ r.onNome }}" title="Nome do serviço (editável)" style="display: block; width: 100%; box-sizing: border-box; background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 2px 4px; margin-left: -5px; font-family: var(--font-display); font-weight: 600; font-size: 13px; line-height: 1.3; color: var(--mv-blackout); outline: none;" style-hover="border-color: var(--line-soft);" style-focus="border-color: var(--mv-blackout); background: var(--mv-white);">
+                    <input type="text" value="{{ r.unidade }}" sc-camel-on-input="{{ r.onUnidade }}" title="Unidade (editável)" style="display: block; width: 100%; box-sizing: border-box; background: transparent; border: 1px solid transparent; border-radius: 5px; padding: 1px 4px; margin-left: -5px; font-family: var(--font-body); font-weight: 300; font-size: 11px; color: var(--text-muted); outline: none;" style-hover="border-color: var(--line-soft);" style-focus="border-color: var(--mv-blackout); background: var(--mv-white);">
+                    <sc-if value="{{ r.showDesc }}" hint-placeholder-val="{{ false }}">
+                      <textarea value="{{ r.desc }}" sc-camel-on-input="{{ r.onDesc }}" placeholder="Descrição que aparece no PDF (ex.: entregas, formato, observações)" rows="2" style="display: block; width: 100%; box-sizing: border-box; margin-top: 4px; background: var(--surface-sunk); border: 1.5px solid var(--line-soft); border-radius: 8px; padding: 5px 8px; font-family: var(--font-body); font-weight: 300; font-size: 11.5px; line-height: 1.45; color: var(--mv-ink-700); resize: vertical; outline: none;" style-focus="border-color: var(--mv-blackout);"></textarea>
+                    </sc-if>
+                    <sc-if value="{{ r.showDescBtn }}" hint-placeholder-val="{{ true }}">
+                      <button sc-camel-on-click="{{ r.openDesc }}" style="background: transparent; border: none; padding: 1px 0; margin-top: 1px; cursor: pointer; font-family: var(--font-body); font-weight: 500; font-size: 10.5px; color: var(--mv-tungsten);" style-hover="text-decoration: underline;">+ descrição</button>
+                    </sc-if>
                     <sc-if value="{{ r.showChips }}" hint-placeholder-val="{{ true }}">
                       <div style="display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px;">
                         <sc-for list="{{ r.chips }}" as="ch" hint-placeholder-count="3">
@@ -1120,7 +1184,7 @@ a:hover { text-decoration: underline; }
             <sc-if value="{{ ps.showHead }}" hint-placeholder-val="{{ false }}">
               <div style="display: flex; align-items: center; gap: 10px; margin: 6px 0 12px;">
                 <span style="flex: none; font-family: 'Muring 01'; font-weight: 800; font-size: 13px; color: #121212; background: var(--mv-keylight); border-radius: 8px; padding: 4px 11px;">{{ ps.letter }}</span>
-                <span style="font-family: 'Muring 01'; font-weight: 800; font-size: 18px; letter-spacing: -0.01em; color: var(--mv-blackout);">Cenário {{ ps.letter }} · {{ ps.name }}</span>
+                <span style="font-family: 'Muring 01'; font-weight: 800; font-size: 18px; letter-spacing: -0.01em; color: var(--mv-blackout);">{{ ps.heading }}</span>
               </div>
             </sc-if>
             <div style="background: var(--mv-white); border: 1px solid var(--mv-ink-200); border-radius: 14px; overflow: hidden; margin-bottom: 18px;">
@@ -1138,6 +1202,9 @@ a:hover { text-decoration: underline; }
                       <div style="font-family: 'Muring 01'; font-weight: 600; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: {{ p.catColor }};">{{ p.cat }}</div>
                     </sc-if>
                     <div style="font-family: 'Muring 01'; font-weight: {{ p.nameWeight }}; font-size: {{ p.nameSize }}; color: {{ p.nameColor }};">{{ p.nome }}</div>
+                    <sc-if value="{{ p.hasDesc }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-family: 'Muring 01'; font-weight: 300; font-size: 11.5px; line-height: 1.5; color: var(--mv-ink-500); white-space: pre-wrap; margin-top: 2px; padding-left: {{ p.indent }};">{{ p.desc }}</div>
+                    </sc-if>
                     <sc-if value="{{ p.hasNotes }}" hint-placeholder-val="{{ false }}">
                       <sc-for list="{{ p.notes }}" as="n" hint-placeholder-count="1">
                         <div style="font-family: 'Muring 01'; font-weight: 600; font-size: 10.5px; color: {{ n.color }};">{{ n.text }}</div>
@@ -1252,14 +1319,29 @@ a:hover { text-decoration: underline; }
   <div sc-camel-on-click="{{ closeRecentBg }}" style="position: fixed; inset: 0; background: rgba(18,18,18,.72); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
     <div sc-camel-on-click="{{ stop }}" style="background: var(--mv-white); border-radius: 18px; padding: 28px; max-width: 560px; width: 100%; max-height: 88vh; overflow-y: auto; color: var(--mv-blackout); display: flex; flex-direction: column; gap: 14px;">
       <div>
-        <h3 style="font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.01em; margin: 0 0 4px;">Propostas recentes</h3>
-        <p style="font-family: var(--font-body); font-weight: 300; font-size: 12px; color: var(--text-muted); margin: 0;">Salvas neste navegador. Toque em "Abrir" para continuar editando.</p>
+        <h3 style="font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.01em; margin: 0 0 4px;">Propostas</h3>
+        <p style="font-family: var(--font-body); font-weight: 300; font-size: 12px; color: var(--text-muted); margin: 0;">{{ recentHint }}</p>
       </div>
+      <sc-if value="{{ showRecentTabs }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <div style="display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface-sunk); border: 1px solid var(--line-soft);">
+            <button sc-camel-on-click="{{ pickRecentOnline }}" style="padding: 5px 12px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-display); font-weight: 700; font-size: 12px; background: {{ recentTabOnline.bg }}; color: {{ recentTabOnline.fg }};">Equipe (online)</button>
+            <button sc-camel-on-click="{{ pickRecentLocal }}" style="padding: 5px 12px; border-radius: 8px; border: none; cursor: pointer; font-family: var(--font-display); font-weight: 700; font-size: 12px; background: {{ recentTabLocal.bg }}; color: {{ recentTabLocal.fg }};">Este navegador</button>
+          </div>
+          <input type="text" value="{{ recentQ }}" sc-camel-on-input="{{ setRecentQ }}" placeholder="Buscar cliente, projeto, nº…" style="flex: 1; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 6px 10px; font-family: var(--font-body); font-size: 12px; outline: none;" style-focus="border-color: var(--mv-blackout);">
+        </div>
+      </sc-if>
+      <sc-if value="{{ recentLoading }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 10px; text-align: center; color: var(--text-muted); font-size: 12px;">Carregando do GitHub…</div>
+      </sc-if>
+      <sc-if value="{{ hasRecentErr }}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 10px 12px; border-radius: 10px; background: rgba(229,57,53,.08); color: var(--status-rec); font-size: 12px; font-weight: 600;">{{ recentErr }}</div>
+      </sc-if>
       <div style="display: flex; flex-direction: column; gap: 8px; max-height: 55vh; overflow-y: auto;">
         <sc-for list="{{ recentList }}" as="rp" hint-placeholder-count="2">
           <div style="border: 1.5px solid var(--line-soft); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
             <div style="min-width: 0;">
-              <div style="font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--mv-blackout);">{{ rp.clientLine }}</div>
+              <div style="font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--mv-blackout);">{{ rp.clientLine }}<sc-if value="{{ rp.isCurrent }}" hint-placeholder-val="{{ false }}"><span style="margin-left: 8px; font-family: var(--font-label); font-weight: 600; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; background: var(--mv-keylight); color: var(--mv-blackout); padding: 2px 6px; border-radius: 5px; vertical-align: middle;">aberta</span></sc-if></div>
               <div style="font-family: var(--font-body); font-weight: 300; font-size: 11px; color: var(--text-muted); margin-top: 1px;">{{ rp.meta }}</div>
             </div>
             <div style="font-family: var(--font-display); font-weight: 800; font-size: 14px; color: var(--mv-keylight-700); white-space: nowrap;">{{ rp.total }}</div>
@@ -1270,7 +1352,7 @@ a:hover { text-decoration: underline; }
           </div>
         </sc-for>
         <sc-if value="{{ noRecents }}" hint-placeholder-val="{{ false }}">
-          <div style="padding: 30px 20px; text-align: center; color: var(--text-muted); font-size: 12.5px;">Nenhuma proposta salva ainda. Gere um PDF para começar o histórico.</div>
+          <div style="padding: 30px 20px; text-align: center; color: var(--text-muted); font-size: 12.5px;">{{ emptyRecentMsg }}</div>
         </sc-if>
       </div>
       <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
@@ -1280,9 +1362,95 @@ a:hover { text-decoration: underline; }
   </div>
 </sc-if>
 
+<!-- ══════════ MODAL CONEXÃO GITHUB ══════════ -->
+<sc-if value="{{ ghOpen }}" hint-placeholder-val="{{ false }}">
+  <div sc-camel-on-click="{{ ghCloseBg }}" style="position: fixed; inset: 0; background: rgba(18,18,18,.72); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div sc-camel-on-click="{{ stop }}" style="background: var(--mv-white); border-radius: 18px; padding: 28px; max-width: 520px; width: 100%; max-height: 88vh; overflow-y: auto; color: var(--mv-blackout); display: flex; flex-direction: column; gap: 14px;">
+      <div>
+        <h3 style="font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.01em; margin: 0 0 4px;">Salvar online (GitHub)</h3>
+        <p style="font-family: var(--font-body); font-weight: 300; font-size: 12px; line-height: 1.55; color: var(--text-muted); margin: 0;">A tabela de cachês e as propostas ficam num repositório privado da MV LAB. O token fica guardado só neste navegador.</p>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);">Organização</label>
+          <input type="text" value="{{ ghOwner }}" sc-camel-on-input="{{ setGhOwner }}" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 9px 13px; font-family: var(--font-body); font-size: 13px; outline: none;" style-focus="border-color: var(--mv-blackout);">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);">Repositório de dados</label>
+          <input type="text" value="{{ ghRepo }}" sc-camel-on-input="{{ setGhRepo }}" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 9px 13px; font-family: var(--font-body); font-size: 13px; outline: none;" style-focus="border-color: var(--mv-blackout);">
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <label style="font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);">Token do GitHub</label>
+        <input type="password" value="{{ ghToken }}" sc-camel-on-input="{{ setGhToken }}" placeholder="github_pat_…" autocomplete="off" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 9px 13px; font-family: ui-monospace, monospace; font-size: 12px; outline: none;" style-focus="border-color: var(--mv-blackout);">
+        <span style="font-family: var(--font-body); font-weight: 300; font-size: 11px; line-height: 1.5; color: var(--text-muted);">GitHub → Settings → Developer settings → Fine-grained tokens. Acesso só a este repositório, permissão <b>Contents: Read and write</b>.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <label style="font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);">Seu nome (aparece no histórico)</label>
+        <input type="text" value="{{ ghAuthor }}" sc-camel-on-input="{{ setGhAuthor }}" placeholder="Ex: Martin" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 9px 13px; font-family: var(--font-body); font-size: 13px; outline: none;" style-focus="border-color: var(--mv-blackout);">
+      </div>
+      <sc-if value="{{ hasGhStatus }}" hint-placeholder-val="{{ false }}">
+        <div style="font-family: var(--font-body); font-weight: 600; font-size: 12px; line-height: 1.5; color: {{ ghStatusColor }};">{{ ghStatus }}</div>
+      </sc-if>
+      <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center; margin-top: 6px;">
+        <button sc-camel-on-click="{{ ghDisconnect }}" style="background: transparent; border: none; cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: 12px; color: var(--text-muted); padding: 0;" style-hover="color: var(--status-rec);">Desconectar</button>
+        <div style="display: flex; gap: 10px;">
+          <x-import component-from-global-scope="MVLABDesignSystem_5446a1.Button" variant="ghost" size="sm" on-click="{{ ghClose }}" hint-size="auto,36px">Fechar</x-import>
+          <x-import component-from-global-scope="MVLABDesignSystem_5446a1.Button" variant="primary" size="sm" on-click="{{ ghTest }}" hint-size="auto,36px">Salvar e testar</x-import>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<!-- ══════════ MODAL TABELA DE CACHÊS ══════════ -->
+<sc-if value="{{ catOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position: fixed; inset: 0; background: rgba(18,18,18,.72); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div sc-camel-on-click="{{ stop }}" style="background: var(--mv-white); border-radius: 18px; padding: 24px 26px; max-width: 920px; width: 100%; height: 88vh; color: var(--mv-blackout); display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;">
+        <div>
+          <h3 style="font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.01em; margin: 0 0 4px;">Tabela de cachês</h3>
+          <p style="font-family: var(--font-body); font-weight: 300; font-size: 12px; line-height: 1.5; color: var(--text-muted); margin: 0; max-width: 60ch;">{{ catNote }}</p>
+        </div>
+        <span style="font-family: var(--font-label); font-weight: 600; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap;">{{ catCount }}</span>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <input type="text" value="{{ catQ }}" sc-camel-on-input="{{ setCatQ }}" placeholder="Filtrar por nome ou categoria" style="flex: 1; background: var(--surface-sunk); border: 2px solid var(--line-soft); border-radius: 10px; padding: 8px 12px; font-family: var(--font-body); font-size: 13px; outline: none;" style-focus="border-color: var(--mv-blackout);">
+        <x-import component-from-global-scope="MVLABDesignSystem_5446a1.Button" variant="outline" size="sm" on-click="{{ catAdd }}" hint-size="auto,36px">+ Serviço</x-import>
+      </div>
+      <div style="display: grid; grid-template-columns: 150px 1fr 170px 110px 32px; gap: 8px; padding: 8px 10px; background: var(--mv-blackout); border-radius: 10px; font-family: var(--font-label); font-weight: 600; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--mv-keylight);">
+        <div>Categoria</div><div>Serviço</div><div>Unidade</div><div style="text-align: right;">Valor R$</div><div></div>
+      </div>
+      <div style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;">
+        <sc-for list="{{ catRows }}" as="cr" hint-placeholder-count="6">
+          <div style="display: grid; grid-template-columns: 150px 1fr 170px 110px 32px; gap: 8px; align-items: center; padding: 2px 10px;">
+            <input type="text" list="mv-cat-list" value="{{ cr.cat }}" sc-camel-on-input="{{ cr.setCat }}" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 1.5px solid var(--line-soft); border-radius: 8px; padding: 6px 8px; font-family: var(--font-body); font-size: 12px; outline: none;" style-focus="border-color: var(--mv-blackout);">
+            <input type="text" value="{{ cr.nome }}" sc-camel-on-input="{{ cr.setNome }}" placeholder="Nome do serviço" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 1.5px solid var(--line-soft); border-radius: 8px; padding: 6px 8px; font-family: var(--font-body); font-size: 12px; font-weight: 600; outline: none;" style-focus="border-color: var(--mv-blackout);">
+            <input type="text" value="{{ cr.unidade }}" sc-camel-on-input="{{ cr.setUnidade }}" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 1.5px solid var(--line-soft); border-radius: 8px; padding: 6px 8px; font-family: var(--font-body); font-size: 12px; outline: none;" style-focus="border-color: var(--mv-blackout);">
+            <input type="number" value="{{ cr.valor }}" sc-camel-on-input="{{ cr.setValor }}" min="0" step="0.01" style="width: 100%; box-sizing: border-box; background: var(--surface-sunk); border: 1.5px solid var(--line-soft); border-radius: 8px; padding: 6px 8px; font-family: var(--font-body); font-size: 12px; font-weight: 700; text-align: right; outline: none; font-variant-numeric: tabular-nums;" style-focus="border-color: var(--mv-blackout);">
+            <button sc-camel-on-click="{{ cr.del }}" title="Remover" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: transparent; border: 1px solid var(--line-soft); border-radius: 8px; color: var(--text-muted); cursor: pointer;" style-hover="border-color: var(--status-rec); color: var(--status-rec);"><svg width="11" height="11" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+          </div>
+        </sc-for>
+      </div>
+      <datalist id="mv-cat-list">
+        <option value="Pré-Produção"></option><option value="Produção"></option><option value="Fotografia"></option><option value="Pós-Produção"></option><option value="Tabela Itaú"></option><option value="Finalização"></option><option value="Equipamentos"></option>
+      </datalist>
+      <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--line-soft);">
+        <span style="font-family: var(--font-body); font-weight: 300; font-size: 11px; color: var(--text-muted);">{{ catCatsHint }}</span>
+        <div style="display: flex; gap: 10px;">
+          <x-import component-from-global-scope="MVLABDesignSystem_5446a1.Button" variant="ghost" size="sm" on-click="{{ catClose }}" hint-size="auto,36px">Fechar</x-import>
+          <sc-if value="{{ catCanSave }}" hint-placeholder-val="{{ true }}">
+            <x-import component-from-global-scope="MVLABDesignSystem_5446a1.Button" variant="primary" size="sm" on-click="{{ catSave }}" hint-size="auto,36px">{{ catSaveLabel }}</x-import>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
 <!-- TOAST -->
 <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
-  <div style="position: fixed; bottom: 22px; right: 22px; background: var(--mv-blackout); border: 2px solid var(--mv-keylight); border-radius: 12px; padding: 11px 18px; font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--mv-keylight); z-index: 2000; pointer-events: none;">{{ toastMsg }}</div>
+  <div class="no-print" style="position: fixed; bottom: 22px; right: 22px; background: var(--mv-blackout); border: 2px solid var(--mv-keylight); border-radius: 12px; padding: 11px 18px; font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--mv-keylight); z-index: 2000; pointer-events: none;">{{ toastMsg }}</div>
 </sc-if>
 
 </x-dc>
@@ -1324,7 +1492,16 @@ class Component extends DCLogic {
     },
     modal: null,
     recentOpen: false,
-    toast: { msg: '', on: false }
+    toast: { msg: '', on: false },
+    // online (GitHub)
+    docId: null,
+    services: null, svcSha: null, svcOnline: null, svcLoading: false,
+    saving: false, lastSaved: '', netErr: '',
+    recentTab: 'online', onlineList: [], onlineLoading: false, onlineErr: '',
+    ghModal: null,
+    catModal: null, catQ: '', catSaving: false,
+    // v26
+    descOpen: {}, dragOver: null, dragging: null, pkgMenu: null, libOnline: null
   };
 
 
@@ -1333,6 +1510,8 @@ class Component extends DCLogic {
     d.setDate(d.getDate() + 30);
     this.setState({ validade: d.toISOString().split('T')[0] });
     this._icons();
+    this.loadCatalog(false);
+    this.loadLibrary();
   }
 
   componentDidUpdate() { this._icons(); }
@@ -1396,6 +1575,188 @@ class Component extends DCLogic {
   patchGroup(gid, patch) {
     this.updCur(c => { c.groups = c.groups.map(g => g.gid === gid ? Object.assign({}, g, patch) : g); });
   }
+  // ───────────── ordem dos itens / pacotes ─────────────
+  // Move um item uma posição para cima/baixo entre os itens da mesma seção (mesmo pacote ou avulsos)
+  moveItem(rid, dir) {
+    this.updCur(c => {
+      const items = c.items;
+      const ix = items.findIndex(i => i.rid === rid);
+      if (ix < 0) return;
+      const gid = items[ix].gid || null;
+      let j = ix + dir;
+      while (j >= 0 && j < items.length && (items[j].gid || null) !== gid) j += dir;
+      if (j < 0 || j >= items.length) return;
+      const a = items[ix]; items[ix] = items[j]; items[j] = a;
+    });
+  }
+  // Solta o item arrastado antes do item alvo (adota o pacote do alvo)
+  dropItem(dragRid, targetRid) {
+    if (dragRid == null || dragRid === targetRid) return;
+    this.updCur(c => {
+      const from = c.items.findIndex(i => i.rid === dragRid);
+      if (from < 0) return;
+      const moved = c.items.splice(from, 1)[0];
+      const to = c.items.findIndex(i => i.rid === targetRid);
+      if (to < 0) { c.items.splice(from, 0, moved); return; }
+      c.items.splice(to, 0, Object.assign({}, moved, { gid: c.items[to].gid || null }));
+    });
+  }
+  // Solta o item no cabeçalho de uma seção: vai para o fim do pacote (ou dos avulsos)
+  dropIntoSection(dragRid, gid) {
+    if (dragRid == null) return;
+    this.updCur(c => {
+      const from = c.items.findIndex(i => i.rid === dragRid);
+      if (from < 0) return;
+      const moved = Object.assign({}, c.items.splice(from, 1)[0], { gid: gid || null });
+      let last = -1;
+      c.items.forEach((i, k) => { if ((i.gid || null) === (gid || null)) last = k; });
+      c.items.splice(last + 1, 0, moved);
+    });
+  }
+  moveGroup(gid, dir) {
+    this.updCur(c => {
+      const ix = c.groups.findIndex(g => g.gid === gid);
+      const j = ix + dir;
+      if (ix < 0 || j < 0 || j >= c.groups.length) return;
+      const a = c.groups[ix]; c.groups[ix] = c.groups[j]; c.groups[j] = a;
+    });
+  }
+  dragHandlers(targetRid, sectionGid) {
+    return {
+      onDragOver: (e) => { e.preventDefault(); if (this.state.dragOver !== (targetRid ?? 'sec:' + sectionGid)) this.setState({ dragOver: targetRid ?? 'sec:' + sectionGid }); },
+      onDragLeave: () => {},
+      onDrop: (e) => {
+        e.preventDefault();
+        const rid = this._dragRid; this._dragRid = null;
+        this.setState({ dragOver: null, dragging: null });
+        if (targetRid != null) this.dropItem(rid, targetRid); else this.dropIntoSection(rid, sectionGid);
+      }
+    };
+  }
+
+  // ───────────── copiar pacotes / biblioteca ─────────────
+  // Clona um pacote (com itens) com novos ids
+  clonePackage(g, items, nidStart, nameSuffix) {
+    let nid = nidStart;
+    const gid = 'g' + (nid++);
+    const group = Object.assign({}, this.clone(g), { gid, nome: (g.nome || 'Pacote') + (nameSuffix || ''), ad: this.normAdics(g.ad) });
+    const its = items.map(i => Object.assign({}, this.clone(i), { rid: nid++, gid, ad: this.normAdics(i.ad) }));
+    return { group, items: its, nid };
+  }
+
+  copyGroupTo(gid, targetIx) {
+    const st = this.state;
+    const src = this.cur(st);
+    const g = src.groups.find(x => x.gid === gid);
+    if (!g) return;
+    const its = src.items.filter(i => i.gid === gid);
+    this.setState(s2 => {
+      const same = targetIx === s2.active;
+      const r = this.clonePackage(g, its, s2.nid, same ? ' (cópia)' : '');
+      const scenarios = s2.scenarios.slice();
+      const t = Object.assign({}, scenarios[targetIx]);
+      t.groups = t.groups.concat([r.group]);
+      t.items = t.items.concat(r.items);
+      scenarios[targetIx] = t;
+      return { scenarios, nid: r.nid, pkgMenu: null };
+    });
+    const t = st.scenarios[targetIx];
+    this.showToast(targetIx === st.active ? 'Pacote duplicado' : 'Pacote copiado para o cenário ' + (this.LETTERS[targetIx] || '') + ' · ' + (t.name || ''));
+  }
+
+  libLocal() {
+    try { return JSON.parse(localStorage.getItem('mvlab_pkg_library')) || []; } catch (e) { return []; }
+  }
+  saveLibLocal(list) {
+    try { localStorage.setItem('mvlab_pkg_library', JSON.stringify(list)); } catch (e) { /* sem storage */ }
+  }
+
+  async loadLibrary() {
+    if (!this.online()) { this.setState({ libOnline: null }); return; }
+    const S = this.store();
+    try {
+      const r = await S.getJSON(S.PATH_LIBRARY);
+      this.setState({ libOnline: (r && r.data && r.data.packages) || [] });
+    } catch (e) {
+      this.setState({ libOnline: null });
+    }
+  }
+
+  libEntryFrom(g, items) {
+    const S = this.store();
+    return {
+      id: 'k_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+      nome: g.nome || 'Pacote',
+      multStr: g.multStr || '1', fixedOn: !!g.fixedOn, fixedStr: g.fixedStr || '', detail: g.detail !== false,
+      ad: this.clone(g.ad || this.newAdics()),
+      items: items.map(i => ({ cat: i.cat, nome: i.nome, unidade: i.unidade, desc: i.desc || '', valorStr: i.valorStr, discStr: i.discStr, qty: i.qty, ad: this.clone(i.ad || this.newAdics()) })),
+      savedAt: new Date().toISOString(),
+      savedBy: (S && S.getConfig().author) || ''
+    };
+  }
+
+  async saveGroupToLib(gid) {
+    const sc = this.cur();
+    const g = sc.groups.find(x => x.gid === gid);
+    if (!g) return;
+    const its = sc.items.filter(i => i.gid === gid);
+    if (!its.length) { this.showToast('Pacote vazio — adicione itens antes de salvar'); return; }
+    const entry = this.libEntryFrom(g, its);
+    const sameName = (x) => (x.nome || '').trim().toLowerCase() === entry.nome.trim().toLowerCase();
+    const existing = (this.online() ? (this.state.libOnline || []) : this.libLocal()).find(sameName);
+    if (existing && !confirm('Já existe um pacote salvo chamado "' + entry.nome + '". Substituir?')) { this.setState({ pkgMenu: null }); return; }
+    if (existing) entry.id = existing.id;
+    this.setState({ pkgMenu: null });
+    if (this.online()) {
+      const S = this.store();
+      try {
+        await S.update(S.PATH_LIBRARY, cur => {
+          const list = ((cur && cur.packages) || []).filter(x => x.id !== entry.id);
+          list.unshift(entry);
+          return { packages: list };
+        }, 'Biblioteca de pacotes: ' + entry.nome, { packages: [] });
+        await this.loadLibrary();
+        this.showToast('Pacote "' + entry.nome + '" salvo na biblioteca da equipe');
+      } catch (e) {
+        this.showToast('Falha ao salvar online: ' + this.errMsg(e).slice(0, 60));
+      }
+    } else {
+      const list = this.libLocal().filter(x => x.id !== entry.id);
+      list.unshift(entry);
+      this.saveLibLocal(list);
+      this.forceUpdate();
+      this.showToast('Pacote "' + entry.nome + '" salvo na biblioteca (neste navegador)');
+    }
+  }
+
+  insertLibEntry(entry) {
+    this.setState(s2 => {
+      const g = { gid: 'tmp', nome: entry.nome, multStr: entry.multStr || '1', fixedOn: !!entry.fixedOn, fixedStr: entry.fixedStr || '', detail: entry.detail !== false, ad: entry.ad };
+      const r = this.clonePackage(g, entry.items || [], s2.nid, '');
+      const scenarios = s2.scenarios.slice();
+      const c = Object.assign({}, scenarios[s2.active]);
+      c.groups = c.groups.concat([r.group]);
+      c.items = c.items.concat(r.items);
+      scenarios[s2.active] = c;
+      return { scenarios, nid: r.nid };
+    });
+    this.showToast('Pacote "' + entry.nome + '" adicionado');
+  }
+
+  async deleteLibEntry(entry, isOnline) {
+    if (!confirm('Excluir "' + entry.nome + '" da biblioteca de pacotes?')) return;
+    if (isOnline) {
+      const S = this.store();
+      try {
+        await S.update(S.PATH_LIBRARY, cur => ({ packages: ((cur && cur.packages) || []).filter(x => x.id !== entry.id) }), 'Biblioteca de pacotes: remove ' + entry.nome, { packages: [] });
+        await this.loadLibrary();
+      } catch (e) { this.showToast('Erro ao excluir: ' + this.errMsg(e).slice(0, 60)); }
+    } else {
+      this.saveLibLocal(this.libLocal().filter(x => x.id !== entry.id));
+      this.forceUpdate();
+    }
+  }
+
   toggleAd(obj, key) {
     const ad = Object.assign({}, obj.ad);
     ad[key] = Object.assign({}, ad[key], { on: !ad[key].on });
@@ -1560,7 +1921,7 @@ class Component extends DCLogic {
       (prefix || '') + '+' + this.pctStr(this.num(ad[d.key].pct)) + ' ' + d.short.toLowerCase() + ' (' + fmt(byKey[d.key]) + ')');
   }
 
-  // ───────────── recentes ─────────────
+  // ───────────── recentes (navegador) ─────────────
   getRecents() {
     try { return JSON.parse(localStorage.getItem('mvlab_recent_proposals')) || []; }
     catch (e) { return []; }
@@ -1570,7 +1931,13 @@ class Component extends DCLogic {
     catch (e) { /* localStorage indisponível */ }
   }
 
-  snapshotProposal() {
+  newDocId() {
+    const d = new Date();
+    const p2 = (n) => String(n).padStart(2, '0');
+    return 'p_' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  }
+
+  snapshotProposal(id) {
     const st = this.state;
     const totals = st.scenarios.map(sc => this.calcTotals(sc).fin);
     const totalStr = totals.length > 1
@@ -1578,8 +1945,9 @@ class Component extends DCLogic {
       : this.fmt(totals[0] || 0);
     return {
       v: 2,
-      id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+      id: id || st.docId || this.newDocId(),
       savedAt: new Date().toISOString(),
+      savedBy: (this.store() && this.store().getConfig().author) || '',
       cliente: st.client || 'Cliente',
       projeto: st.project,
       validade: st.validade,
@@ -1593,11 +1961,12 @@ class Component extends DCLogic {
     };
   }
 
-  saveToRecents() {
-    const st = this.state;
-    if (!st.scenarios.some(sc => sc.items.length)) return;
-    let list = this.getRecents();
-    list.unshift(this.snapshotProposal());
+  // Mesma proposta (mesmo id) substitui a entrada anterior em vez de duplicar
+  saveToRecents(snap) {
+    if (!this.state.scenarios.some(sc => sc.items.length)) return;
+    snap = snap || this.snapshotProposal();
+    let list = this.getRecents().filter(x => x.id !== snap.id);
+    list.unshift(snap);
     if (list.length > 20) list = list.slice(0, 20);
     this.saveRecentsList(list);
   }
@@ -1625,6 +1994,7 @@ class Component extends DCLogic {
       const scope = p.scope ? Object.assign({}, p.scope) : st.scope;
       const scopeHas = !!(scope.projeto || scope.captacao || scope.entregaveis);
       return {
+        docId: p.id || null,
         client: p.cliente || '',
         project: p.projeto || '',
         validade: p.validade || '',
@@ -1644,6 +2014,144 @@ class Component extends DCLogic {
     const list = this.getRecents().filter(x => x.id !== id);
     this.saveRecentsList(list);
     this.forceUpdate();
+  }
+
+  // ───────────── online (GitHub) ─────────────
+  store() { return (typeof window !== 'undefined' && window.MVLAB_STORE) || null; }
+  online() { const S = this.store(); return !!(S && S.isEnabled()); }
+
+  errMsg(e) { return (e && e.message) || 'Erro desconhecido'; }
+
+  async loadCatalog(silent) {
+    if (!this.online()) { this.setState({ svcOnline: null }); return; }
+    const S = this.store();
+    this.setState({ svcLoading: true });
+    try {
+      const r = await S.getJSON(S.PATH_SERVICES);
+      if (r && r.data && Array.isArray(r.data.services)) {
+        this.setState({ services: r.data.services, svcSha: r.sha, svcOnline: { updatedAt: r.data.updatedAt || '', updatedBy: r.data.updatedBy || '' }, svcLoading: false, netErr: '' });
+      } else {
+        // arquivo ainda não existe: segue com a tabela embutida
+        this.setState({ services: null, svcSha: null, svcOnline: { updatedAt: '', updatedBy: '', missing: true }, svcLoading: false, netErr: '' });
+      }
+    } catch (e) {
+      this.setState({ svcLoading: false, svcOnline: null, netErr: this.errMsg(e) });
+      if (!silent) this.showToast('Tabela online indisponível — usando a local');
+    }
+  }
+
+  async saveCatalog(rows) {
+    const S = this.store();
+    if (!this.online()) { this.showToast('Conecte ao GitHub para salvar a tabela'); return false; }
+    const services = rows
+      .map(r => ({ cat: (r.cat || '').trim(), nome: (r.nome || '').trim(), unidade: (r.unidade || '').trim(), valor: Math.round(this.num(r.valor) * 100) / 100 }))
+      .filter(r => r.nome && r.cat);
+    const payload = { updatedAt: new Date().toISOString(), updatedBy: S.getConfig().author || '', services };
+    this.setState({ catSaving: true });
+    try {
+      // usa o sha que foi lido: se alguém salvou depois, o GitHub recusa (409) e avisamos
+      const sha = await S.putJSON(S.PATH_SERVICES, payload, 'Tabela de cachês atualizada (' + services.length + ' serviços)', this.state.svcSha || null);
+      this.setState({ services, svcSha: sha, svcOnline: { updatedAt: payload.updatedAt, updatedBy: payload.updatedBy }, catSaving: false, catModal: null });
+      this.showToast('Tabela de cachês salva online');
+      return true;
+    } catch (e) {
+      this.setState({ catSaving: false });
+      if (e.status === 409 || e.status === 422) {
+        alert('Outra pessoa salvou a tabela enquanto você editava. Recarregue a tabela e refaça a alteração.');
+        this.loadCatalog(true);
+      } else alert('Não foi possível salvar: ' + this.errMsg(e));
+      return false;
+    }
+  }
+
+  indexEntry(snap) {
+    const n = (snap.scenarios || []).reduce((a, s) => a + (s.items || []).length, 0);
+    return { id: snap.id, cliente: snap.cliente, projeto: snap.projeto || '', num: (snap.cfg && snap.cfg.num) || '', total: snap.total, savedAt: snap.savedAt, savedBy: snap.savedBy || '', items: n, scenarios: (snap.scenarios || []).length };
+  }
+
+  async saveOnline(snap) {
+    if (!this.online()) return false;
+    const S = this.store();
+    snap = snap || this.snapshotProposal();
+    const label = (snap.cfg && snap.cfg.num ? snap.cfg.num + ' · ' : '') + snap.cliente + (snap.projeto ? ' · ' + snap.projeto : '');
+    this.setState({ saving: true });
+    try {
+      await S.putJSON(S.proposalPath(snap.id), snap, 'Proposta ' + label);
+      const entry = this.indexEntry(snap);
+      await S.update(S.PATH_INDEX, cur => {
+        const list = ((cur && cur.proposals) || []).filter(x => x.id !== snap.id);
+        list.unshift(entry);
+        return { proposals: list };
+      }, 'Índice: ' + label, { proposals: [] });
+      this.setState({ saving: false, docId: snap.id, lastSaved: new Date().toISOString(), netErr: '' });
+      return true;
+    } catch (e) {
+      this.setState({ saving: false, netErr: this.errMsg(e) });
+      this.showToast('Falha ao salvar online: ' + this.errMsg(e).slice(0, 60));
+      return false;
+    }
+  }
+
+  async saveNow() {
+    if (!this.state.scenarios.some(sc => sc.items.length)) { this.showToast('Adicione ao menos um serviço'); return; }
+    const snap = this.snapshotProposal();
+    this.setState({ docId: snap.id });
+    this.saveToRecents(snap);
+    if (!this.online()) { this.showToast('Salva neste navegador (conecte ao GitHub para salvar online)'); return; }
+    if (await this.saveOnline(snap)) this.showToast('Proposta salva online');
+  }
+
+  async loadOnlineList() {
+    if (!this.online()) return;
+    const S = this.store();
+    this.setState({ onlineLoading: true, onlineErr: '' });
+    try {
+      const r = await S.getJSON(S.PATH_INDEX);
+      this.setState({ onlineList: (r && r.data && r.data.proposals) || [], onlineLoading: false });
+    } catch (e) {
+      this.setState({ onlineLoading: false, onlineErr: this.errMsg(e) });
+    }
+  }
+
+  async openOnline(entry) {
+    const S = this.store();
+    this.setState({ onlineLoading: true });
+    try {
+      const r = await S.getJSON(S.proposalPath(entry.id));
+      this.setState({ onlineLoading: false });
+      if (!r) { this.showToast('Arquivo da proposta não encontrado'); return; }
+      this.reopenProposal(r.data);
+    } catch (e) {
+      this.setState({ onlineLoading: false });
+      this.showToast('Erro ao abrir: ' + this.errMsg(e).slice(0, 60));
+    }
+  }
+
+  async deleteOnline(entry) {
+    if (!confirm('Excluir a proposta "' + entry.cliente + '" para toda a equipe?\n(O histórico continua recuperável pelo GitHub.)')) return;
+    const S = this.store();
+    try {
+      await S.remove(S.proposalPath(entry.id), 'Proposta excluída: ' + entry.cliente);
+      await S.update(S.PATH_INDEX, cur => ({ proposals: ((cur && cur.proposals) || []).filter(x => x.id !== entry.id) }), 'Índice: remove ' + entry.cliente, { proposals: [] });
+      if (this.state.docId === entry.id) this.setState({ docId: null });
+      this.loadOnlineList();
+    } catch (e) {
+      this.showToast('Erro ao excluir: ' + this.errMsg(e).slice(0, 60));
+    }
+  }
+
+  async testConnection(form) {
+    const S = this.store();
+    S.setConfig({ owner: form.owner.trim(), repo: form.repo.trim(), branch: (form.branch || 'main').trim(), token: form.token.trim(), author: form.author.trim() });
+    this.setState({ ghModal: Object.assign({}, form, { status: 'Testando…', ok: null }) });
+    try {
+      const info = await S.test();
+      this.setState({ ghModal: Object.assign({}, form, { status: 'Conectado a ' + S.repoLabel() + (info.private ? ' (privado)' : ' — ATENÇÃO: repositório público, os valores ficam visíveis'), ok: true }) });
+      this.loadCatalog(true);
+      this.loadLibrary();
+    } catch (e) {
+      this.setState({ ghModal: Object.assign({}, form, { status: this.errMsg(e), ok: false }) });
+    }
   }
 
   // ───────────── view-models para o template ─────────────
@@ -1691,7 +2199,25 @@ class Component extends DCLogic {
       remove: () => this.updCur(c => { c.items = c.items.filter(x => x.rid !== i.rid); }),
       unpack: () => this.patchItem(i.rid, { gid: null }),
       onDisc: (e) => this.patchItem(i.rid, { discStr: e.target.value }),
-      onValor: (e) => this.patchItem(i.rid, { valorStr: e.target.value })
+      onValor: (e) => this.patchItem(i.rid, { valorStr: e.target.value }),
+      // edição completa
+      onNome: (e) => this.patchItem(i.rid, { nome: e.target.value }),
+      onUnidade: (e) => this.patchItem(i.rid, { unidade: e.target.value }),
+      onCat: (e) => this.patchItem(i.rid, { cat: e.target.value }),
+      desc: i.desc || '',
+      showDesc: !!(i.desc || this.state.descOpen[i.rid]),
+      descBtnLabel: (i.desc || this.state.descOpen[i.rid]) ? '' : '+ descrição',
+      showDescBtn: !(i.desc || this.state.descOpen[i.rid]),
+      openDesc: () => this.setState(s2 => ({ descOpen: Object.assign({}, s2.descOpen, { [i.rid]: true }) })),
+      onDesc: (e) => this.patchItem(i.rid, { desc: e.target.value }),
+      // ordem
+      moveUp: () => this.moveItem(i.rid, -1),
+      moveDown: () => this.moveItem(i.rid, 1),
+      onDragStart: (e) => { this._dragRid = i.rid; try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i.rid)); } catch (x) {} this.setState({ dragging: i.rid }); },
+      onDragEnd: () => { this._dragRid = null; this.setState({ dragOver: null, dragging: null }); },
+      dropLine: this.state.dragOver === i.rid && this.state.dragging !== i.rid ? '3px solid var(--mv-keylight)' : '3px solid transparent',
+      rowOpacity: this.state.dragging === i.rid ? '0.4' : '1',
+      ...this.dragHandlers(i.rid, null)
     };
   }
 
@@ -1710,6 +2236,7 @@ class Component extends DCLogic {
       this.adicNotes(m.byKey, i.ad).forEach(t => notes.push({ text: t, color: 'var(--mv-tungsten-700)' }));
       rows.push(Object.assign({}, plain, {
         cat: i.cat, nome: i.nome, unidade: i.unidade, qty: String(i.qty),
+        desc: (i.desc || '').trim(), hasDesc: !!(i.desc || '').trim(),
         unitStr: fmt(m.valorDesc), subStr: fmt(m.sub), notes, hasNotes: notes.length > 0, showCat: true
       }));
     });
@@ -1728,7 +2255,7 @@ class Component extends DCLogic {
       this.adicNotes(gm.pkgByKey, g.ad).forEach(t => notes.push({ text: t, color: 'var(--mv-tungsten-700)' }));
       rows.push(Object.assign({}, pkg, {
         cat: 'Pacote' + (gm.mult > 1 ? ' · ' + gm.mult + ' unidades' : ''), nome: g.nome || 'Pacote', unidade: 'por pacote',
-        qty: '×' + gm.mult, unitStr: fmt(gm.perUnit), subStr: fmt(gm.base), notes, hasNotes: notes.length > 0, showCat: true
+        qty: '×' + gm.mult, unitStr: fmt(gm.perUnit), subStr: fmt(gm.base), notes, hasNotes: notes.length > 0, showCat: true, desc: '', hasDesc: false
       }));
       if (g.detail) {
         gm.its.forEach((i, ix) => {
@@ -1738,6 +2265,7 @@ class Component extends DCLogic {
           if (!gm.fixed) this.adicNotes(m.byKey, i.ad).forEach(t => cn.push({ text: t, color: 'var(--mv-tungsten-700)' }));
           rows.push(Object.assign({}, comp, {
             cat: '', nome: '↳ ' + i.nome, unidade: i.unidade, qty: String(i.qty),
+            desc: (i.desc || '').trim(), hasDesc: !!(i.desc || '').trim(),
             unitStr: fmt(m.valorDesc), subStr: fmt(m.sub), notes: cn, hasNotes: cn.length > 0, showCat: false
           }));
         });
@@ -1748,16 +2276,16 @@ class Component extends DCLogic {
 
   renderVals() {
     const st = this.state;
-    const S = (typeof window !== 'undefined' && window.MVLAB_SERVICES) || [];
+    const S = st.services || (typeof window !== 'undefined' && window.MVLAB_SERVICES) || [];
     const fmt = this.fmt.bind(this);
     const cats = [...new Set(S.map(s => s.cat))];
     const sc = this.cur(st);
     const T = this.calcTotals(sc);
 
-    const catButtons = ['all'].concat(cats).map(c => {
+    const catButtons = ['all', 'pkgs'].concat(cats).map(c => {
       const active = st.cat === c;
       return {
-        label: c === 'all' ? 'Todos' : c,
+        label: c === 'all' ? 'Todos' : c === 'pkgs' ? '★ Pacotes salvos' : c,
         bg: active ? 'var(--mv-keylight)' : 'transparent',
         fg: active ? 'var(--mv-blackout)' : 'var(--mv-ink-400)',
         bd: active ? 'var(--mv-keylight)' : 'var(--mv-ink-600)',
@@ -1769,6 +2297,29 @@ class Component extends DCLogic {
     const filtered = S.filter(s =>
       (st.cat === 'all' || s.cat === st.cat) &&
       (!q || s.nome.toLowerCase().includes(q) || s.cat.toLowerCase().includes(q)));
+    // biblioteca de pacotes (online quando conectado + os salvos neste navegador)
+    const showLib = st.cat === 'pkgs';
+    const libOn = this.online() && Array.isArray(st.libOnline);
+    const libAll = (libOn ? st.libOnline.map(e => ({ e, online: true })) : [])
+      .concat(this.libLocal().map(e => ({ e, online: false })));
+    const libCards = libAll
+      .filter(({ e }) => !q || [e.nome].concat((e.items || []).map(i => i.nome)).join(' ').toLowerCase().includes(q))
+      .map(({ e, online }) => {
+        const its = e.items || [];
+        const sum = its.reduce((a, i) => a + this.num(i.valorStr) * (1 - Math.min(100, this.num(i.discStr)) / 100) * (i.qty || 1), 0);
+        const per = e.fixedOn && this.num(e.fixedStr) > 0 ? this.num(e.fixedStr) : sum;
+        const mult = Math.max(1, Math.round(this.num(e.multStr)) || 1);
+        return {
+          nome: e.nome,
+          meta: its.length + (its.length === 1 ? ' item' : ' itens') + (mult > 1 ? ' · ×' + mult : '') + (e.fixedOn ? ' · preço fechado' : ''),
+          itemsLine: its.map(i => (i.qty > 1 ? i.qty + '× ' : '') + i.nome).join(' · '),
+          preco: fmt(per),
+          tag: online ? 'equipe' : 'navegador',
+          tagColor: online ? 'var(--mv-keylight)' : 'var(--mv-ink-400)',
+          add: () => this.insertLibEntry(e),
+          del: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); this.deleteLibEntry(e, online); }
+        };
+      });
     const services = filtered.map(s => ({
       cat: s.cat, nome: s.nome, unidade: s.unidade,
       preco: fmt(s.valor),
@@ -1799,7 +2350,9 @@ class Component extends DCLogic {
       sections.push({
         isLoose: true, isPkg: false, rows: looseRows, isEmptyPkg: false,
         title: sc.groups.length ? 'Itens avulsos' : 'Itens',
-        hint: looseRows.length ? 'Marque itens para agrupá-los em um pacote' : ''
+        hint: looseRows.length ? 'Arraste ⠿ para reordenar · marque itens para agrupar em pacote' : '',
+        headDrop: this.state.dragOver === 'sec:null' ? 'var(--mv-keylight-100)' : 'transparent',
+        ...this.dragHandlers(null, null)
       });
     }
     sc.groups.forEach(g => {
@@ -1833,7 +2386,20 @@ class Component extends DCLogic {
         toggleDetail: () => this.patchGroup(g.gid, { detail: g.detail === false }),
         ungroup: () => this.ungroup(g.gid),
         remove: () => this.removeGroup(g.gid),
-        moveHere: () => this.moveSelected(g.gid)
+        moveHere: () => this.moveSelected(g.gid),
+        // v26: ordem, cópia, biblioteca
+        moveUp: () => this.moveGroup(g.gid, -1),
+        moveDown: () => this.moveGroup(g.gid, 1),
+        menuOpen: st.pkgMenu === g.gid,
+        toggleMenu: () => this.setState({ pkgMenu: st.pkgMenu === g.gid ? null : g.gid }),
+        copyTargets: st.scenarios.map((s, ix) => ({
+          label: ix === st.active ? 'Duplicar neste cenário' : 'Cenário ' + (this.LETTERS[ix] || ix + 1) + ' · ' + (s.name || 'Cenário'),
+          go: () => this.copyGroupTo(g.gid, ix)
+        })),
+        saveToLib: () => this.saveGroupToLib(g.gid),
+        libLabel: this.online() ? 'Salvar na biblioteca da equipe' : 'Salvar na biblioteca (navegador)',
+        headDrop: this.state.dragOver === 'sec:' + g.gid ? 'var(--mv-keylight)' : 'transparent',
+        ...this.dragHandlers(null, g.gid)
       });
     });
 
@@ -1900,6 +2466,7 @@ class Component extends DCLogic {
         showHead: printable.length > 1,
         letter: this.LETTERS[ix] || String(ix + 1),
         name: s.name || 'Cenário',
+        heading: (!s.name || /^cen[aá]rio\s+[a-j]$/i.test(s.name.trim())) ? 'Cenário ' + (this.LETTERS[ix] || ix + 1) : 'Cenário ' + (this.LETTERS[ix] || ix + 1) + ' · ' + s.name,
         rows: this.printRowsFor(s, t),
         totals: lines,
         totalLabel: printable.length > 1 ? 'Total · Cenário ' + (this.LETTERS[ix] || ix + 1) : 'Total',
@@ -1923,22 +2490,72 @@ class Component extends DCLogic {
       .map(d => ({ num: d.num, label: d.label, text: st.scope[d.key].trim() }));
 
     const m = st.modal;
+    const isOnline = this.online();
+    const recentTab = isOnline ? st.recentTab : 'local';
+    const fmtWhen = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); };
     const recentsRaw = this.getRecents();
-    const recentList = recentsRaw.map(p => {
-      const d = new Date(p.savedAt);
-      const dStr = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const localList = recentsRaw.map(p => {
       const n = p.scenarios ? p.scenarios.reduce((a, s) => a + (s.items || []).length, 0) : (p.items || []).length;
       const ns = p.scenarios ? p.scenarios.length : 1;
       return {
         clientLine: (p.cliente || 'Cliente') + (p.projeto ? ' · ' + p.projeto : ''),
-        meta: dStr + ' · ' + n + (n === 1 ? ' item' : ' itens') + (ns > 1 ? ' · ' + ns + ' cenários' : ''),
+        meta: fmtWhen(p.savedAt) + ' · ' + n + (n === 1 ? ' item' : ' itens') + (ns > 1 ? ' · ' + ns + ' cenários' : ''),
         total: p.total,
+        isCurrent: !!st.docId && p.id === st.docId,
         open: () => this.reopenProposal(p),
         del: () => this.deleteRecent(p.id)
       };
     });
+    const onlineQ = (st.recentQ || '').toLowerCase();
+    const onlineList = (st.onlineList || [])
+      .filter(e => !onlineQ || [e.cliente, e.projeto, e.num, e.savedBy].join(' ').toLowerCase().includes(onlineQ))
+      .map(e => ({
+        clientLine: (e.cliente || 'Cliente') + (e.projeto ? ' · ' + e.projeto : ''),
+        meta: [e.num, fmtWhen(e.savedAt), e.items + (e.items === 1 ? ' item' : ' itens') + (e.scenarios > 1 ? ' · ' + e.scenarios + ' cenários' : ''), e.savedBy ? 'por ' + e.savedBy : ''].filter(Boolean).join(' · '),
+        total: e.total,
+        isCurrent: !!st.docId && e.id === st.docId,
+        open: () => this.openOnline(e),
+        del: () => this.deleteOnline(e)
+      }));
+    const recentList = recentTab === 'online' ? onlineList : localList;
     const hasRecents = recentsRaw.length > 0;
-    const noRecents = recentsRaw.length === 0;
+    const noRecents = recentList.length === 0 && !(recentTab === 'online' && st.onlineLoading);
+    const tabStyle = (on) => ({ bg: on ? 'var(--mv-blackout)' : 'transparent', fg: on ? 'var(--mv-keylight)' : 'var(--text-muted)' });
+
+    // status online (toolbar)
+    const cfgGH = this.store() ? this.store().getConfig() : {};
+    const netStatus = !isOnline
+      ? { label: 'Offline', dot: 'var(--mv-ink-400)', fg: 'var(--text-muted)' }
+      : st.netErr
+        ? { label: 'Erro online', dot: 'var(--status-rec)', fg: 'var(--status-rec)' }
+        : st.saving
+          ? { label: 'Salvando…', dot: 'var(--mv-keylight)', fg: 'var(--mv-blackout)' }
+          : { label: st.docId && st.lastSaved ? 'Salvo ' + new Date(st.lastSaved).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Online', dot: '#22a35a', fg: 'var(--mv-blackout)' };
+
+    // catálogo: origem
+    const svcTag = st.svcLoading ? 'carregando…'
+      : (isOnline && st.svcOnline && !st.svcOnline.missing) ? 'online' + (st.svcOnline.updatedAt ? ' · ' + new Date(st.svcOnline.updatedAt).toLocaleDateString('pt-BR') : '')
+      : (isOnline && st.svcOnline && st.svcOnline.missing) ? 'local · ainda não publicada'
+      : 'local';
+
+    // modal GitHub
+    const gh = st.ghModal;
+    const setGh = (k) => (e) => { const v = e.target.value; this.setState(s2 => ({ ghModal: Object.assign({}, s2.ghModal, { [k]: v, status: '', ok: null }) })); };
+
+    // modal editor de cachês
+    const cm = st.catModal;
+    const catQ = (st.catQ || '').toLowerCase();
+    const catRows = cm ? cm.rows.map((r, ix) => ({ r, ix }))
+      .filter(({ r }) => !catQ || [r.cat, r.nome, r.unidade].join(' ').toLowerCase().includes(catQ))
+      .map(({ r, ix }) => {
+        const setF = (k) => (e) => { const v = e.target.value; this.setState(s2 => { const rows = s2.catModal.rows.slice(); rows[ix] = Object.assign({}, rows[ix], { [k]: v }); return { catModal: Object.assign({}, s2.catModal, { rows, dirty: true }) }; }); };
+        return {
+          cat: r.cat, nome: r.nome, unidade: r.unidade, valor: String(r.valor),
+          setCat: setF('cat'), setNome: setF('nome'), setUnidade: setF('unidade'), setValor: setF('valor'),
+          del: () => this.setState(s2 => ({ catModal: Object.assign({}, s2.catModal, { rows: s2.catModal.rows.filter((_, j) => j !== ix), dirty: true }) }))
+        };
+      }) : [];
+    const catCats = [...new Set((cm ? cm.rows : S).map(x => x.cat).filter(Boolean))];
 
     const uiAdicLabel = T.globalAdics.map(a => a.label.replace('Taxa de ', '') + ' +' + this.pctStr(a.pct))
       .concat(T.localAdics.map(a => a.label.replace('Taxa de ', ''))).join(' · ');
@@ -1948,7 +2565,10 @@ class Component extends DCLogic {
       q: st.q,
       setQ: (e) => this.setState({ q: e.target.value }),
       catButtons, services,
-      noResults: filtered.length === 0,
+      noResults: !showLib && filtered.length === 0,
+      showLib, showServices: !showLib, libCards,
+      libEmpty: showLib && libCards.length === 0,
+      libEmptyMsg: 'Nenhum pacote salvo ainda. Em um pacote da proposta, use "Copiar / salvar ▾" → ' + (this.online() ? '"Salvar na biblioteca da equipe".' : '"Salvar na biblioteca".'),
       showPrices: st.cfg.showPrices ?? true,
       customNome: st.custom.nome,
       customUnidade: st.custom.unidade,
@@ -1975,12 +2595,15 @@ class Component extends DCLogic {
       clearAll: () => {
         if (!st.scenarios.some(s => s.items.length)) return;
         if (!confirm('Limpar proposta? (todos os cenários)')) return;
-        this.setState({ scenarios: [this.newScenario('Principal')], active: 0, sel: {} });
+        this.setState({ scenarios: [this.newScenario('Principal')], active: 0, sel: {}, docId: null });
       },
       openModal: () => this.setState({ modal: Object.assign({}, st.cfg) }),
       doPrint: () => {
         if (!st.scenarios.some(s => s.items.length)) { this.showToast('Adicione ao menos um serviço'); return; }
-        this.saveToRecents();
+        const snap = this.snapshotProposal();
+        this.setState({ docId: snap.id });
+        this.saveToRecents(snap);
+        if (this.online()) this.saveOnline(snap).then(ok => ok && this.showToast('PDF gerado · proposta salva online'));
         const go = () => {
           requestAnimationFrame(() => {
             const root = document.getElementById('print-root');
@@ -2015,10 +2638,68 @@ class Component extends DCLogic {
           setTimeout(go, 200);
         }
       },
-      openRecent: () => this.setState({ recentOpen: true }),
+      openRecent: () => { this.setState({ recentOpen: true }); if (this.online() && st.recentTab === 'online') this.loadOnlineList(); },
       closeRecent: () => this.setState({ recentOpen: false }),
       closeRecentBg: (e) => { if (e.target === e.currentTarget) this.setState({ recentOpen: false }); },
       hasRecents, noRecents, recentList,
+      isOnline,
+      showRecentTabs: isOnline,
+      recentTabOnline: tabStyle(recentTab === 'online'),
+      recentTabLocal: tabStyle(recentTab === 'local'),
+      pickRecentOnline: () => { this.setState({ recentTab: 'online' }); this.loadOnlineList(); },
+      pickRecentLocal: () => this.setState({ recentTab: 'local' }),
+      recentHint: recentTab === 'online'
+        ? 'Propostas da equipe, salvas em ' + this.store().repoLabel() + '. Cada salvamento vira uma versão no GitHub.'
+        : 'Salvas só neste navegador.' + (isOnline ? '' : ' Conecte ao GitHub (botão "Offline" na barra superior) para compartilhar com a equipe.'),
+      recentLoading: recentTab === 'online' && st.onlineLoading,
+      recentErr: recentTab === 'online' ? st.onlineErr : '',
+      hasRecentErr: recentTab === 'online' && !!st.onlineErr,
+      recentQ: st.recentQ || '',
+      setRecentQ: (e) => this.setState({ recentQ: e.target.value }),
+      emptyRecentMsg: recentTab === 'online' ? 'Nenhuma proposta online ainda. Use "Salvar" ou "Gerar PDF".' : 'Nenhuma proposta salva ainda. Gere um PDF para começar o histórico.',
+
+      // status / salvar
+      netLabel: netStatus.label, netDot: netStatus.dot, netFg: netStatus.fg,
+      saveNow: () => this.saveNow(),
+      openGh: () => {
+        const c = this.store().getConfig();
+        this.setState({ ghModal: { owner: c.owner, repo: c.repo, branch: c.branch || 'main', token: c.token, author: c.author || '', status: st.netErr || '', ok: st.netErr ? false : null } });
+      },
+
+      // modal GitHub
+      ghOpen: !!gh,
+      ghOwner: gh ? gh.owner : '', ghRepo: gh ? gh.repo : '', ghBranch: gh ? gh.branch : '', ghToken: gh ? gh.token : '', ghAuthor: gh ? gh.author : '',
+      setGhOwner: setGh('owner'), setGhRepo: setGh('repo'), setGhBranch: setGh('branch'), setGhToken: setGh('token'), setGhAuthor: setGh('author'),
+      ghStatus: gh ? gh.status : '',
+      hasGhStatus: !!(gh && gh.status),
+      ghStatusColor: gh && gh.ok === true ? '#1d7f45' : gh && gh.ok === false ? 'var(--status-rec)' : 'var(--text-muted)',
+      ghTest: () => this.testConnection(st.ghModal),
+      ghDisconnect: () => {
+        if (!confirm('Remover o token deste navegador?')) return;
+        this.store().setConfig({ token: '' });
+        this.setState({ ghModal: null, services: null, svcOnline: null, svcSha: null, netErr: '', recentTab: 'local', libOnline: null });
+      },
+      ghClose: () => this.setState({ ghModal: null }),
+      ghCloseBg: (e) => { if (e.target === e.currentTarget) this.setState({ ghModal: null }); },
+
+      // catálogo de cachês
+      svcTag,
+      openCatalog: () => this.setState({ catQ: '', catModal: { rows: this.clone(S), dirty: false } }),
+      catOpen: !!cm,
+      catRows,
+      catCount: cm ? cm.rows.length + ' serviços' : '',
+      catCatsHint: 'Categorias: ' + catCats.join(' · '),
+      catQ: st.catQ || '',
+      setCatQ: (e) => this.setState({ catQ: e.target.value }),
+      catAdd: () => this.setState(s2 => ({ catQ: '', catModal: Object.assign({}, s2.catModal, { rows: s2.catModal.rows.concat([{ cat: (catCats[0] || 'Produção'), nome: '', unidade: 'Por diária', valor: 0 }]), dirty: true }) })),
+      catSave: () => this.saveCatalog(st.catModal.rows),
+      catSaveLabel: st.catSaving ? 'Salvando…' : (isOnline ? 'Salvar para a equipe' : 'Conecte ao GitHub para salvar'),
+      catCanSave: isOnline,
+      catNote: isOnline
+        ? 'Alterações valem para novas linhas adicionadas. Propostas já montadas mantêm os valores que tinham.'
+        : 'Sem conexão com o GitHub: a edição não pode ser salva. Configure no botão "Offline" da barra superior.',
+      catClose: () => { if (st.catModal && st.catModal.dirty && !confirm('Descartar alterações na tabela?')) return; this.setState({ catModal: null }); },
+      catReload: () => { this.setState({ catModal: null }); this.loadCatalog(false); },
 
       // cenários
       scenarioTabs, multiScen,
